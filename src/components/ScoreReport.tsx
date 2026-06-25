@@ -36,11 +36,10 @@ export default function ScoreReport({ html, fileName }: ScoreReportProps) {
     <div className="report-wrapper">
       <div className="report-toolbar">
         <div className="report-meta">
-          <span className="report-icon">✅</span>
           <span>解析完了：<strong>{fileName}</strong></span>
         </div>
         <button className="btn-print" onClick={handlePrint}>
-          🖨️ 印刷 / PDF保存
+          印刷 / PDF保存
         </button>
       </div>
       <div

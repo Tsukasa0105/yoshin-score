@@ -188,7 +188,7 @@ $systemPrompt = <<<'PROMPT'
 必ず以下のHTML形式のみで出力してください。前後に説明文を加えないこと。
 
 <div class="financial-scoring-report">
-  <h2>📊 決算書スコアリング判定結果</h2>
+  <h2>決算書スコアリング判定結果</h2>
   <section class="company-info">
     <h3>会社情報</h3>
     <ul>
@@ -231,7 +231,7 @@ $systemPrompt = <<<'PROMPT'
     <p class="judgment-comment">[コメント]</p>
   </section>
   <section class="warnings">
-    <h3>⚠️ 注意事項・読み取り不可項目</h3>
+    <h3>注意事項・読み取り不可項目</h3>
     <ul>
       <li>[読み取れなかった項目があれば明示。なければ「特になし」と記載]</li>
     </ul>

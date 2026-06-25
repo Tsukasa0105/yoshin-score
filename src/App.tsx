@@ -83,10 +83,14 @@ function App() {
       <header className="app-header">
         <div className="header-inner">
           <div className="brand">
-            <span className="brand-logo">📊</span>
+            <svg className="brand-logo" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+              <rect x="2" y="20" width="7" height="14" rx="1" fill="white" opacity="0.85"/>
+              <rect x="14" y="12" width="7" height="22" rx="1" fill="white" opacity="0.85"/>
+              <rect x="26" y="4"  width="7" height="30" rx="1" fill="white"/>
+            </svg>
             <div>
               <h1>与信スコアリングシステム</h1>
-              <p>株式会社セラヴィ｜財務審査AI</p>
+              <p>株式会社セラヴィ｜財務審査</p>
             </div>
           </div>
           <div className="header-actions">
@@ -95,9 +99,8 @@ function App() {
               onClick={() => setShowHistory(true)}
               aria-label="解析履歴を表示"
             >
-              📋 解析履歴
+              解析履歴
             </button>
-            <span className="header-badge">AI POWERED</span>
           </div>
         </div>
       </header>
@@ -112,7 +115,7 @@ function App() {
 
           {error && !loading && (
             <div className="error-box">
-              <h3>❌ エラーが発生しました</h3>
+              <h3>エラーが発生しました</h3>
               <p>{error}</p>
               <button onClick={handleReset}>やり直す</button>
             </div>
@@ -122,7 +125,7 @@ function App() {
             <>
               {fromHistory && (
                 <div className="history-banner">
-                  📋 履歴から表示中
+                  履歴から表示中
                 </div>
               )}
               <ScoreReport html={result} fileName={fileName} />

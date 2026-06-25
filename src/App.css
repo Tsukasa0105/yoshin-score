@@ -32,8 +32,9 @@
 }
 
 .brand-logo {
-  font-size: 2rem;
-  line-height: 1;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
 }
 
 .brand h1 {

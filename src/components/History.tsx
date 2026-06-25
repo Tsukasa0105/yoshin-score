@@ -74,7 +74,7 @@ export default function History({ onViewResult, onClose }: HistoryProps) {
                 onClick={e => deleteItem(item.id, e)}
                 aria-label="削除"
               >
-                🗑
+                削除
               </button>
             </div>
           ))}

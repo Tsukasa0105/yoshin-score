@@ -11,7 +11,7 @@ export default function LoadingSpinner({ fileName }: LoadingSpinnerProps) {
         <div /><div /><div /><div />
       </div>
       <p className="loading-title">AIが決算書を解析中です</p>
-      {fileName && <p className="loading-file">📄 {fileName}</p>}
+      {fileName && <p className="loading-file">{fileName}</p>}
       <p className="loading-sub">財務データを読み取り、スコアリングを行っています<br />しばらくお待ちください（通常30〜60秒）</p>
     </div>
   )

@@ -57,6 +57,8 @@ jobs:
           cp .htaccess deploy/.htaccess
           # Copy PHP API
           cp -r api deploy/api
+          # Ensure data directory exists on server so PHP can write history.json
+          mkdir -p deploy/api/data
           echo "=== Deploy directory contents ==="
           find deploy -maxdepth 3 -type f | head -40
 
@@ -80,7 +82,7 @@ jobs:
             set net:timeout 30;
             set net:max-retries 3;
             open -u '$FTP_USER','$FTP_PASS' ftp://$FTP_HOST;
-            mirror --reverse --delete --parallel=5 --verbose=1 ./deploy/ $FTP_DIR;
+            mirror --reverse --delete --parallel=5 --verbose=1 --exclude-glob 'history.json' ./deploy/ $FTP_DIR;
             quit
           "
         env:

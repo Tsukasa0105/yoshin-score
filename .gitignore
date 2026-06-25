@@ -5,5 +5,6 @@ deploy/
 .env.local
 *.log
 api/vendor/
+api/data/history.json
 .DS_Store
 Thumbs.db

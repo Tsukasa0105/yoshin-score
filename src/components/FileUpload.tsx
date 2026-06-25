@@ -51,7 +51,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
     <div className="upload-section">
       <div className="upload-intro">
         <h2>決算書をアップロード</h2>
-        <p>AIが財務データを自動で読み取り、与信スコアリングを行います</p>
+        <p>財務データを自動で読み取り、与信スコアリングを行います</p>
       </div>
 
       <div className="upload-drop-col">
@@ -66,7 +66,11 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
           onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
           aria-label="決算書ファイルをアップロード"
         >
-          <span className="upload-icon">📁</span>
+          <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+            <polyline points="16 11 12 7 8 11"/>
+            <line x1="12" y1="7" x2="12" y2="17"/>
+          </svg>
           <p className="upload-text">ここにファイルをドラッグ＆ドロップ</p>
           <p className="upload-sub">または</p>
           <span className="btn-upload">ファイルを選択</span>
@@ -79,17 +83,16 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
           />
         </div>
 
-        {fileError && <p className="file-error">⚠️ {fileError}</p>}
+        {fileError && <p className="file-error">{fileError}</p>}
 
         <div className="info-card">
           <h4>対応ファイル形式</h4>
           <ul className="format-list">
-            <li>📄 PDF</li>
-            <li>🖼️ JPEG / PNG</li>
-            <li>🖼️ WEBP / GIF</li>
-            <li>📊 Excel (.xls/.xlsx)</li>
-            <li>🌐 HTML</li>
-            <li>　</li>
+            <li>PDF</li>
+            <li>JPEG / PNG</li>
+            <li>WEBP / GIF</li>
+            <li>Excel (.xls / .xlsx)</li>
+            <li>HTML</li>
           </ul>
           <p className="format-note">最大ファイルサイズ：20MB</p>
         </div>
