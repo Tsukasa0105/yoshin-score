@@ -1,0 +1,81 @@
+name: Build & Deploy to FTP
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Setup Node.js ─────────────────────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ── 3. Install & Build React app ─────────────────────────────
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build React app
+        run: npm run build
+
+      # ── 4. Setup PHP & Composer ──────────────────────────────────
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: api/vendor
+          key: composer-${{ hashFiles('api/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        working-directory: api
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      # ── 5. Assemble deployment directory ─────────────────────────
+      - name: Assemble deploy directory
+        run: |
+          mkdir -p deploy
+          # Copy React build output
+          cp -r dist/. deploy/
+          # Copy root .htaccess
+          cp .htaccess deploy/.htaccess
+          # Copy PHP API
+          cp -r api deploy/api
+          echo "=== Deploy directory contents ==="
+          find deploy -maxdepth 3 -type f | head -40
+
+      # ── 6. Deploy to FTP ─────────────────────────────────────────
+      - name: Deploy to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: ./deploy/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            deploy/.env
+            deploy/**/.env
+
+      - name: Deployment complete
+        run: echo "✅ Deployment to ${{ secrets.FTP_HOST }} completed successfully"

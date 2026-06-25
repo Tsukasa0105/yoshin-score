@@ -1,0 +1,10 @@
+node_modules/
+dist/
+deploy/
+.env
+.env.local
+*.log
+api/vendor/
+api/composer.lock
+.DS_Store
+Thumbs.db

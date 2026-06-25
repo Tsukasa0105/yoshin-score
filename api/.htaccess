@@ -1,0 +1,25 @@
+# Protect vendor directory
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^vendor/ - [F,L]
+</IfModule>
+
+# Only allow PHP files to be accessed
+<FilesMatch "^(?!analyze).*\.php$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Protect composer files
+<FilesMatch "^(composer\.(json|lock))$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Set upload limits (override php.ini if possible)
+<IfModule mod_php.c>
+  php_value upload_max_filesize 20M
+  php_value post_max_size 22M
+  php_value max_execution_time 180
+  php_value memory_limit 256M
+</IfModule>

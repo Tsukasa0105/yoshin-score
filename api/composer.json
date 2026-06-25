@@ -1,0 +1,11 @@
+{
+    "name": "celavie/yoshin-score-api",
+    "description": "Credit scoring API backend",
+    "require": {
+        "php": ">=8.0",
+        "phpoffice/phpspreadsheet": "^2.3"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

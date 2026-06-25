@@ -1,0 +1,125 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.app-header {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, var(--color-primary-light) 100%);
+  color: #fff;
+  padding: 0 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.brand h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  line-height: 1.2;
+}
+
+.brand p {
+  font-size: .75rem;
+  opacity: .8;
+  letter-spacing: .03em;
+}
+
+.header-badge {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 20px;
+  padding: .3rem .85rem;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+/* ── Main ────────────────────────────────────────────────────────── */
+
+.app-main {
+  flex: 1;
+  padding: 2.5rem 1.5rem;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Error ───────────────────────────────────────────────────────── */
+
+.error-box {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.error-box h3 {
+  color: var(--color-danger);
+  margin-bottom: .5rem;
+}
+
+.error-box p {
+  color: #7f1d1d;
+  margin-bottom: 1rem;
+}
+
+.error-box button,
+.btn-retry {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: .7rem 1.5rem;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: background .2s;
+  font-family: inherit;
+}
+
+.error-box button:hover,
+.btn-retry:hover {
+  background: var(--color-primary-light);
+}
+
+.retry-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.app-footer {
+  background: var(--color-primary-dark);
+  color: rgba(255,255,255,.6);
+  text-align: center;
+  padding: 1.25rem;
+  font-size: .8rem;
+}
