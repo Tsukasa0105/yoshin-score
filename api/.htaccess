@@ -1,11 +1,12 @@
-# Protect vendor directory
+# Protect vendor and data directories
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^vendor/ - [F,L]
+  RewriteRule ^data/ - [F,L]
 </IfModule>
 
-# Only allow PHP files to be accessed
-<FilesMatch "^(?!analyze).*\.php$">
+# Only allow analyze.php and history.php
+<FilesMatch "^(?!analyze|history).*\.php$">
   Order allow,deny
   Deny from all
 </FilesMatch>

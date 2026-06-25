@@ -49,6 +49,12 @@
   letter-spacing: .03em;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
 .header-badge {
   background: rgba(255,255,255,.15);
   border: 1px solid rgba(255,255,255,.3);
@@ -57,6 +63,35 @@
   font-size: .75rem;
   font-weight: 600;
   letter-spacing: .08em;
+}
+
+.btn-history {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 20px;
+  color: #fff;
+  padding: .3rem .9rem;
+  font-size: .82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+
+.btn-history:hover {
+  background: rgba(255,255,255,.25);
+}
+
+/* ── History result banner ───────────────────────────────────────── */
+.history-banner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-light);
+  font-size: .85rem;
+  font-weight: 600;
+  padding: .5rem 1rem;
+  margin-bottom: 1rem;
 }
 
 /* ── Main ────────────────────────────────────────────────────────── */

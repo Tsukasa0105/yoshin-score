@@ -49,6 +49,8 @@ if ($apiKey === '') {
     exit;
 }
 
+$today = (new DateTime('now', new DateTimeZone('Asia/Tokyo')))->format('Y年m月d日');
+
 // ── File validation ────────────────────────────────────────────────
 if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
     $uploadErrors = [
@@ -273,7 +275,7 @@ if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
             ],
             [
                 'type' => 'text',
-                'text' => '上記の決算書画像を解析し、与信スコアリングを行ってください。',
+                'text' => "今日の日付は{$today}です。判定日に正確に使用してください。上記の決算書画像を解析し、与信スコアリングを行ってください。",
             ],
         ],
     ];
@@ -294,7 +296,7 @@ if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
             ],
             [
                 'type' => 'text',
-                'text' => '上記の決算書PDFを解析し、与信スコアリングを行ってください。',
+                'text' => "今日の日付は{$today}です。判定日に正確に使用してください。上記の決算書PDFを解析し、与信スコアリングを行ってください。",
             ],
         ],
     ];
@@ -303,7 +305,7 @@ if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
     $excelText = buildExcelText($tmpPath, $ext, $file['name']);
     $messages[] = [
         'role'    => 'user',
-        'content' => "以下のExcel決算書データを解析し、与信スコアリングを行ってください。\n\n" . $excelText,
+        'content' => "今日の日付は{$today}です。判定日に正確に使用してください。以下のExcel決算書データを解析し、与信スコアリングを行ってください。\n\n" . $excelText,
     ];
 
 } elseif (in_array($ext, ['html', 'htm'], true)) {
@@ -316,7 +318,7 @@ if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
 
     $messages[] = [
         'role'    => 'user',
-        'content' => "以下のHTML決算書データを解析し、与信スコアリングを行ってください。\n\n" . $text,
+        'content' => "今日の日付は{$today}です。判定日に正確に使用してください。以下のHTML決算書データを解析し、与信スコアリングを行ってください。\n\n" . $text,
     ];
 }
 
@@ -365,6 +367,71 @@ function buildExcelText(string $tmpPath, string $ext, string $originalName): str
     return "Excelファイル（{$originalName}）が提供されました。\n"
          . "PhpSpreadsheetライブラリが未インストールのため、テキスト変換できませんでした。\n"
          . "ファイル内の財務数値を可能な範囲で解析してください。";
+}
+
+// ── History helper ─────────────────────────────────────────────────
+function saveToHistory(string $fileName, string $html, string $today): void {
+    $dataDir     = __DIR__ . '/data';
+    $historyFile = $dataDir . '/history.json';
+
+    if (!is_dir($dataDir)) {
+        mkdir($dataDir, 0755, true);
+    }
+
+    $history = [];
+    if (file_exists($historyFile)) {
+        $raw     = (string)file_get_contents($historyFile);
+        $history = json_decode($raw, true) ?: [];
+    }
+
+    // Extract company name
+    $companyName = '不明';
+    if (preg_match('/<li[^>]*>会社名[：:]\s*([^<]+)<\/li>/u', $html, $m)) {
+        $companyName = trim($m[1]);
+    }
+
+    // Extract judgment result
+    $judgment = '不明';
+    if (preg_match('/<p[^>]+class="judgment-result"[^>]*>\s*(.*?)\s*<\/p>/us', $html, $m)) {
+        $judgment = trim(strip_tags($m[1]));
+    }
+
+    // Extract score from the total row (second-to-last <strong>)
+    $score = '不明';
+    if (preg_match('/<tr[^>]+class="total"[^>]*>(.*?)<\/tr>/us', $html, $rowM)) {
+        if (preg_match_all('/<strong>([^<]+)<\/strong>/u', $rowM[1], $strM)) {
+            $strongs = $strM[1];
+            $cnt     = count($strongs);
+            if ($cnt >= 2) {
+                $score = trim($strongs[$cnt - 2]);
+            }
+        }
+    }
+
+    // Determine judgment CSS class
+    $judgmentClass = 'judgment-ok';
+    if (preg_match('/審査NG|足切り|不適格/', $judgment)) {
+        $judgmentClass = 'judgment-ng';
+    } elseif (preg_match('/課題多|要検討/', $judgment)) {
+        $judgmentClass = 'judgment-warn';
+    }
+
+    $entry = [
+        'id'             => uniqid('r_', true),
+        'timestamp'      => (new DateTime('now', new DateTimeZone('Asia/Tokyo')))->format('c'),
+        'date'           => $today,
+        'company_name'   => $companyName,
+        'file_name'      => $fileName,
+        'score'          => $score,
+        'judgment'       => $judgment,
+        'judgment_class' => $judgmentClass,
+        'html'           => $html,
+    ];
+
+    array_unshift($history, $entry);
+    $history = array_slice($history, 0, 100); // 最大100件
+
+    file_put_contents($historyFile, json_encode($history, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
 }
 
 // ── Call Anthropic API ─────────────────────────────────────────────
@@ -420,6 +487,13 @@ if (preg_match('/```html\s*([\s\S]*?)```/i', $resultText, $m)) {
 // Ensure we at least have the outer div
 if (!str_contains($resultText, 'financial-scoring-report')) {
     $resultText = '<div class="financial-scoring-report">' . $resultText . '</div>';
+}
+
+// Save to history (silent fail)
+try {
+    saveToHistory($file['name'], trim($resultText), $today);
+} catch (\Throwable $e) {
+    // intentionally ignored
 }
 
 echo json_encode(['html' => trim($resultText)], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
