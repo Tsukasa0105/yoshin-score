@@ -87,23 +87,15 @@ body {
   border-bottom: none;
 }
 
+.financial-scoring-report section {
+  overflow-x: auto;
+}
+
 .financial-scoring-report table {
   width: 100%;
   border-collapse: collapse;
   font-size: .9rem;
-  overflow-x: auto;
-  display: block;
-}
-
-.financial-scoring-report thead,
-.financial-scoring-report tbody,
-.financial-scoring-report tfoot,
-.financial-scoring-report tr {
-  display: table-row;
-}
-
-.financial-scoring-report table {
-  display: table;
+  min-width: 480px;
 }
 
 .financial-scoring-report th {
@@ -139,19 +131,33 @@ body {
 
 /* Judgment section */
 .financial-scoring-report .judgment-result {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: .75rem;
-  padding: .75rem 1rem;
+  padding: .65rem 1.1rem;
   border-radius: var(--radius-sm);
   display: inline-block;
-}
-
-.financial-scoring-report .judgment-result:has-text,
-.financial-scoring-report .judgment-result {
   background: #f0fdf4;
   color: var(--color-success);
   border: 2px solid var(--color-success);
+}
+
+.financial-scoring-report .judgment-result.judgment-ok {
+  background: #f0fdf4;
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.financial-scoring-report .judgment-result.judgment-warn {
+  background: #fffbeb;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+
+.financial-scoring-report .judgment-result.judgment-ng {
+  background: #fff5f5;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .financial-scoring-report .judgment-comment {
@@ -159,11 +165,6 @@ body {
   font-size: .95rem;
   line-height: 1.7;
   white-space: pre-wrap;
-}
-
-/* Judgment coloring by content */
-.financial-scoring-report section.judgment {
-  border-left: 5px solid var(--color-success);
 }
 
 .financial-scoring-report .warnings ul li {

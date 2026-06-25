@@ -5,6 +5,5 @@ deploy/
 .env.local
 *.log
 api/vendor/
-api/composer.lock
 .DS_Store
 Thumbs.db

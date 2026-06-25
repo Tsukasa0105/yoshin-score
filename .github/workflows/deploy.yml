@@ -40,12 +40,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: api/vendor
-          key: composer-${{ hashFiles('api/composer.lock') }}
+          key: composer-${{ hashFiles('api/composer.lock', 'api/composer.json') }}
           restore-keys: composer-
 
       - name: Install Composer dependencies
         working-directory: api
-        run: composer install --no-dev --optimize-autoloader --no-interaction
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
       # ── 5. Assemble deployment directory ─────────────────────────
       - name: Assemble deploy directory

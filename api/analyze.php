@@ -69,6 +69,13 @@ if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
 $file    = $_FILES['file'];
 $maxSize = 20 * 1024 * 1024; // 20 MB
 
+// Verify the file was actually uploaded via HTTP POST (security)
+if (!is_uploaded_file($file['tmp_name'])) {
+    http_response_code(400);
+    echo json_encode(['error' => '不正なファイルアップロードです'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 if ($file['size'] > $maxSize) {
     http_response_code(400);
     echo json_encode(['error' => 'ファイルサイズが大きすぎます（最大20MB）'], JSON_UNESCAPED_UNICODE);
@@ -82,6 +89,29 @@ if (!in_array($ext, $allowedExts, true)) {
     http_response_code(400);
     echo json_encode(['error' => '対応していないファイル形式です'], JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+// MIME type validation via finfo (defense in depth)
+$allowedMimes = [
+    'application/pdf',
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/html', 'application/xhtml+xml',
+    'application/zip',           // xlsx is a ZIP
+    'application/octet-stream',  // generic binary fallback
+];
+$finfo    = new finfo(FILEINFO_MIME_TYPE);
+$mimeType = $finfo->file($file['tmp_name']);
+if ($mimeType === false || !in_array($mimeType, $allowedMimes, true)) {
+    // Allow text-based formats that finfo may detect differently
+    if (!str_starts_with((string)$mimeType, 'text/') &&
+        !str_starts_with((string)$mimeType, 'image/') &&
+        !str_starts_with((string)$mimeType, 'application/')) {
+        http_response_code(400);
+        echo json_encode(['error' => '対応していないファイル形式です（MIMEタイプ不正）'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }
 
 // ── System prompt ──────────────────────────────────────────────────
@@ -290,6 +320,13 @@ if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
     ];
 }
 
+// Guard: messages must not be empty
+if (empty($messages)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'ファイルを処理できませんでした。対応形式のファイルを再度アップロードしてください。'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 // ── Excel helper ───────────────────────────────────────────────────
 function buildExcelText(string $tmpPath, string $ext, string $originalName): string {
     $autoload = __DIR__ . '/vendor/autoload.php';
@@ -303,17 +340,17 @@ function buildExcelText(string $tmpPath, string $ext, string $originalName): str
             $text        = '';
 
             foreach ($spreadsheet->getSheetNames() as $sheetName) {
-                $sheet       = $spreadsheet->getSheetByName($sheetName);
-                $highestRow  = $sheet->getHighestDataRow();
-                $highestCol  = $sheet->getHighestDataColumn();
+                $sheet        = $spreadsheet->getSheetByName($sheetName);
+                $highestRow   = $sheet->getHighestDataRow();
+                $highestCol   = $sheet->getHighestDataColumn();
+                $highestColIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestCol);
 
                 $text .= "## シート: {$sheetName}\n\n";
                 for ($row = 1; $row <= $highestRow; $row++) {
                     $rowData = [];
-                    for ($col = 'A'; $col <= $highestCol; $col++) {
+                    for ($colIdx = 1; $colIdx <= $highestColIdx; $colIdx++) {
+                        $col       = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIdx);
                         $rowData[] = $sheet->getCell($col . $row)->getFormattedValue();
-                        if ($col === $highestCol) break;
-                        $col++;
                     }
                     $text .= implode("\t", $rowData) . "\n";
                 }
