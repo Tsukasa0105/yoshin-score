@@ -60,6 +60,14 @@ jobs:
           echo "=== Deploy directory contents ==="
           find deploy -maxdepth 3 -type f | head -40
 
+      # Generate .env with API key from GitHub Secret (never committed to git)
+      - name: Inject Anthropic API key
+        run: |
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" > deploy/api/.env
+          echo ".env created (key length: ${#ANTHROPIC_API_KEY})"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
       # ── 6. Deploy to FTP ─────────────────────────────────────────
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -74,8 +82,6 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
-            deploy/.env
-            deploy/**/.env
 
       - name: Deployment complete
         run: echo "✅ Deployment to ${{ secrets.FTP_HOST }} completed successfully"

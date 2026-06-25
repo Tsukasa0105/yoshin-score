@@ -10,8 +10,8 @@
   Deny from all
 </FilesMatch>
 
-# Protect composer files
-<FilesMatch "^(composer\.(json|lock))$">
+# Protect sensitive files from web access
+<FilesMatch "^(composer\.(json|lock)|\.env.*|php\.ini)$">
   Order allow,deny
   Deny from all
 </FilesMatch>
