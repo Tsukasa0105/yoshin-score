@@ -3,16 +3,16 @@
   RewriteEngine On
   RewriteBase /
 
-  # Do not rewrite static files
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
+  # 1. Serve real files and directories as-is
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
 
-  # Do not rewrite API requests
+  # 2. Pass through API requests
   RewriteRule ^api/ - [L]
 
-  # Redirect everything else to index.html
-  RewriteRule . /index.html [L]
+  # 3. Everything else → SPA entry point
+  RewriteRule ^ /index.html [L]
 </IfModule>
 
 # Security headers
@@ -20,6 +20,13 @@
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Correct MIME types for modern JS/CSS
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType image/svg+xml .svg
 </IfModule>
 
 # Cache static assets
