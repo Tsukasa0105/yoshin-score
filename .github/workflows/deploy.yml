@@ -68,20 +68,26 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      # ── 6. Deploy to FTP ─────────────────────────────────────────
+      # ── 6. Deploy to FTP (via lftp) ──────────────────────────────
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
       - name: Deploy to FTP server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          local-dir: ./deploy/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+        run: |
+          lftp -c "
+            set ftp:ssl-allow yes;
+            set ssl:verify-certificate no;
+            set net:timeout 30;
+            set net:max-retries 3;
+            open -u '$FTP_USER','$FTP_PASS' ftp://$FTP_HOST;
+            mirror --reverse --delete --parallel=5 --verbose=1 ./deploy/ $FTP_DIR;
+            quit
+          "
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR:  ${{ secrets.FTP_SERVER_DIR }}
 
       - name: Deployment complete
         run: echo "✅ Deployment to ${{ secrets.FTP_HOST }} completed successfully"
