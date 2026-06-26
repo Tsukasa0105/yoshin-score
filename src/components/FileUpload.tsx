@@ -100,28 +100,28 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
 
       <div className="info-col">
         <div className="info-card">
-          <h4>審査基準（合計50点）</h4>
+          <h4>審査基準（合計100点）</h4>
           <table className="scoring-table">
             <tbody>
               <tr>
                 <td>自己資本比率</td>
-                <td>20点</td>
+                <td>40点</td>
               </tr>
               <tr>
                 <td>営業利益（直近2期）</td>
-                <td>15点</td>
+                <td>30点</td>
               </tr>
               <tr>
                 <td>流動比率</td>
-                <td>8点</td>
+                <td>16点</td>
               </tr>
               <tr>
                 <td>有利子負債月商倍率</td>
-                <td>7点</td>
+                <td>14点</td>
               </tr>
               <tr className="scoring-total">
                 <td>合計</td>
-                <td>50点</td>
+                <td>100点</td>
               </tr>
             </tbody>
           </table>
